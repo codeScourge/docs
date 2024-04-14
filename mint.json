@@ -5,6 +5,7 @@
     "dark": "/logo/dark.svg",
     "light": "/logo/light.svg"
   },
+
   "favicon": "/favicon.svg",
   "colors": {
     "primary": "#0D9373",
@@ -15,22 +16,20 @@
       "to": "#07C983"
     }
   },
+
   "topbarLinks": [
     {
       "name": "Support",
       "url": "mailto:hi@mintlify.com"
     }
   ],
+
   "topbarCtaButton": {
     "name": "Dashboard",
     "url": "https://dashboard.mintlify.com"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
+
+
   "anchors": [
     {
       "name": "Documentation",
@@ -48,38 +47,24 @@
       "url": "https://mintlify.com/blog"
     }
   ],
+
+
   "navigation": [
     {
-      "group": "Get Started",
+      "group": "Introduction",
       "pages": [
-        "introduction",
-        "quickstart",
-        "development"
+        "intro/00_motivation",
+        "intro/01_structure",
+        "intro/02_installation"
       ]
     },
     {
       "group": "Essentials",
       "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
-      ]
-    },
-    {
-      "group": "API Documentation",
-      "pages": [
-        "api-reference/introduction"
-      ]
-    },
-    {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "main/00_database",
+        "main/01_authentication",
+        "main/02_payments",
+        "main/03_deployment"
       ]
     }
   ],

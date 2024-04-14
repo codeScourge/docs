@@ -1,0 +1,47 @@
+---
+title: "Introduction and Motivation"
+---
+In recent years the Web Development landscape has changed drastically: ever newer tools 
+allow for easier and faster and shipment of your application, on the forefront: JavaScript.
+Everyone else on the other hand is being left behind. In a world where you can get a NextJS
+application up and running with ONE command, we have to fight to set up Webpack or give up and
+live with vanilla JavaScript. 
+
+The same is true for deployment: connect your repository to Vercel, and you have a fully managed 
+application running with everything you could ever need. But thats boring, I would rather
+dockerize my applications, setup Nginx and Gunicorn, Deploy everything to AWS while figuring out which of
+more than 200 services I need to use. Don't forget about domains, oh and also ... just like ...
+
+You see where I am going. While the temptation is high, I currently still prefer Python as my backend.
+It has giant ecosystem of libraries, is widely supported and CAN be made very performant through 
+integration of C and easy hardware acceleration. Since the wide adoption of AI these reasons are becoming
+ever more important
+
+So what is this, and how does it solve these problems?
+This is all the boilerplate you will need for a whole Product, not Project. Besides the development
+environment which allows you to quickly develop using Flask, ReactJS and Bun, it has:
+- a databaseso you can save users
+- payments so these can pay for your product
+- authentification so they can access the bough product
+- and (soon) emails so you can do marketing based on the analytics we are going to implement.
+
+Obviosly you don't want to self-host this application on your laptop. That is why
+everything is configured so you can quickly and cheaply deploy to AWS - doesn't matter if you want
+microservices through orchestrated Docker containers or serverless Lambda functions.
+
+### Prerequisites
+What do you need to know before you start? I expect you to be a Flask developer familiar with modern 
+JavaScript: you need to know how package managers and bundling work. Specifically you should know ReactJS
+and optionally (but highly recommend) TailwindCSS. 
+
+# (* add plug here to my course *)
+
+You should also know the basics of how data is stored with databases.
+
+In the later parts of this documentation I am going to teach you the following concepts and how
+they are used in this
+boilerplate, so you can confidentaly use and customize them:
+- the NoSQL database DynamoDB
+- how authentification works
+- payments using Stripe
+- deployment on AWS

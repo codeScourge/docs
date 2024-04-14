@@ -1,0 +1,18 @@
+---
+title: "Payments"
+---
+
+It works by creating a webhook (an endpoint for Stripe to send information to). 
+Once you have a dedicated IP-adress where you host your application or even a domain, 
+you can configure it as the webhook endpoint on inside Stripe. For now we can pool the 
+connection and redirect it to our webhook route by running ``stripe listen --forward-to 
+localhost:8080/payment/stripe/webhook`` in another terminal. Note how this domain is structured, 
+port 8080 is the one open in local (NOT DOCKER) development, if you change the route, reflect 
+it in the command.
+
+Once the user is logged in and ready to buy, he can be redirected to "/payment/checkout/package_id". 
+Here he is redirected to a page hosted on Stripe where he can pay.  
+
+We configured the checkout creation such a way, that once the payment has gone through, Stripe 
+sends us a request to our webhook containing the users email (by which we can identify him in out 
+DynamoDB, since it's the primary key), as well as the package he bought.

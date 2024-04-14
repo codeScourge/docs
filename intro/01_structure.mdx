@@ -1,0 +1,52 @@
+---
+title: "Project Structure"
+---
+
+As a Flask developer you will immediately notice familiar patterns in the ./backend folder:
+- static holds your CSS and js
+- templates holds your HTML which is rendered by Jinja
+a (link to whitepaper). These allow us to inject
+information directly into our HTML (and even JS), which allows for SSR (Serverside Rendering) just 
+like Next
+
+# Screenshot of folder
+
+Also inside our backend folder are
+- our Flask application in ``app.py``
+- blueprints and other Python files
+- (This one you need to create) ``.env`` file to store secrets
+- a ``requirements.txt`` file
+- a ``gunicorn_config.py`` file which configures our Gunicorn WSGI
+- a Dockerfile to containarize the application for easier development and deployment
+
+Inside our static folder we see another familiar pattern, this time for JavaScript developers: src (source) and
+dist (distination). When bundling our JavaScript, the raw code is being transpiled into a clean bundle and 
+copied from src to dist. After that we can simply import it into our HTML just like any other JavaScript.
+
+# Screenshot of HTML 
+
+Well how do we do it? For that open ``bundle.js`` in our root directory. Here we can see how Bun
+tracks certain JavaScript files and bundles them into our dist directory while keeping the same name.
+
+# Code Snippet of bundle.js
+
+You can try this by simply running this file with ``bun build.js``. However, this is also defined as a
+script in our ``package.json`` and can be run using ``bun run build``.
+
+# Screenshot of scripts
+ 
+In here you also see another command: tailwind. By calling ``bun run tailwind`` we can transpile our
+``globals.css`` file to create an ``output.css`` files which is imported in our ``_base.html``. Since
+this is our Base Template, this CSS file is present in every other HTML file that inherits from it. The
+Configuration for out Tailwind is done in ``tailwind.config.js`` in root. Here we can see that Tailwind 
+scans our Templates for HTML and our Static for JS to only add classes that are actually used. On a side 
+note: The globals.css also holds custom defined CSS, this is also added and applied.
+
+# Screenshot of tailwind.config.js
+
+Another thing you might notice is the nginx folder. This holds all the Configuration 
+for our web server. At the root you can see another Dockerfile which is used for Nginx.
+What is does besides setting up, is copying the static folder and serving it through Nginx
+instead of our Flask application, since this is way more efficient.
+
+The ``docker-compose.yml`` is a way of managing multiple containers and their interactions.

@@ -1,0 +1,37 @@
+---
+title: "Installation / Setup"
+---
+
+### Requirements
+
+Something everyone will have to install is
+- Bun
+- Python
+- Bash
+
+For deployment you will need
+- Docker
+- AWS-CLI
+- Serverless CLI
+
+
+### Running the application
+Almost done, before we start, we need to bundle our static files, 
+since these are not tracked by git which means they will be missing after
+a fresh pull.
+For that we can run
+- ``bun run build`` for JS
+- ``bun run tailwind`` for CSS
+
+After that we are ready to start: 
+- ``bash local.sh`` will start a local (DEVELOPMENT!) server and host it on Port 8080
+or
+- ``bash docker.sh`` which will run the same application with a proper webserver, this is slow - use 
+local if possible
+
+Unfortunately there is just a bit more configuration to do before we start:
+- Setup and connect our DynamoDB database on AWS (or locally)
+- Connect Github so User's can authenticate
+- Configure our application to be used a webhook for Stripe
+
+Continue reading the next section to learn how to do this
