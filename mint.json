@@ -61,10 +61,17 @@
     {
       "group": "Essentials",
       "pages": [
-        "main/00_database",
-        "main/01_authentication",
-        "main/02_payments",
-        "main/03_deployment"
+        "main/00_authentication",
+        "main/01_database",
+        "main/02_payments"
+      ]
+    },
+    {
+      "group": "Deployment",
+      "pages": [
+        "deployment/00_overview",
+        "deployment/01_lambda",
+        "deployment/02_docker"
       ]
     }
   ],

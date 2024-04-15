@@ -1,0 +1,97 @@
+---
+title: "Database"
+---
+
+RDBs (Relational Databases) have been dominating the space since the 80s. Back then the main concern when
+storing data was storage, which is why RDBs are optimized to use up as little space by normalizing data
+to avoid duplication. As you might guess, nowadays storage is not a problem anymore - compute is now the
+major bottleneck. Thats where NoSQL databases like DynamoDB come in. They are:
+
+##### 1. faster and more reliable than a RDB
+NoSQL databases are optimized for speed. You can retrieve items in miliseconds and don't have to use expensive join
+operations.
+
+##### 2. dirt cheap and scale to the moon
+You can use on-demand pricing or provision a database starting at 0.95$ per month. This can be scaled virtually unlimited
+since the NoSQL database are made to shard and can by that scale horizontaly.
+
+##### 3. are easier to manage 
+DynamoDB is fully managed. You will never have to worry about scaling, provisioning, security, backups, rollbacks, and all
+the stuff that comes along with a self-hosted database. 
+
+Here is an [awesome post discussing the strenghts and applications of NoSQL databases](https://www.reddit.com/r/aws/comments/11bpfen/comment/ja3itzd/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
+
+If this is the first time leaving the world of RDBs, the whole mindset of building table schemas will be
+quite confusing. However, getting used to it is definetily worth it.
+Check out [this webinar on modeling data](https://www.youtube.com/watch?v=XMEkNZby95M) before you continue.
+
+Now you need to set up your database. While we could have set it up programmatically in our IAS (Infrastructure
+as Code) Framework SLS, I prefer the peace of mind that you won't accidentaly delete your database when playing around
+with your CLI.
+
+For this follow along the steps shown in [this Introduction to DynamoDB](https://www.youtube.com/watch?v=2k2GINpO308)
+and manually create a table. Otherwise you can follow [this video](https://www.youtube.com/watch?v=vHeYz-C9hSk&list=PL9nWRykSBSFi5QD8ssI0W5odL9S0309E2&index=12)
+and deploy it locally, you will have to change the code accordangly.
+
+Set the primary key as email and leave the search key empty, as this is how we are going to find our users. Also
+add a string property called package_id, more on this later.
+
+Now lets dive into the code and see how we interact with our database. 
+Open ``db.py`` to see that we establish a connection to our table based on its name, add it to ``.env`` under 
+the "DYNAMO_TABLE_NAME" key.
+
+```python db.py
+# --- setup Client ---
+def get_dynamo_table():
+    if "dynamo_table" not in g:
+        g.dynamo_table = boto3.resource("dynamodb").Table(os.getenv("DYNAMO_TABLE_NAME"))
+    return g.dynamo_table
+
+dynamo_table = LocalProxy(get_dynamo_table)
+``` 
+
+To do that we use the AWS SDK for Python boto3. This requires that you have setup the AWS-CLI (see installation).
+What follows are a bunch of helper functions, including the ``add_user`` function I mentioned in the last chapter.
+
+
+```python db.py
+def add_user(email:str):
+    """ If the email does not already exist, we add the user to our table """
+    dynamo_table.put_item(    
+        Item={
+            "email": email,
+            "package_id": 0
+        },
+        ConditionExpression='attribute_not_exists(pk)'
+    )
+```
+
+We use a "ConditionExpression" to only add a user, if he does not yet exist. As you can see, each new user has a 
+"package_id" key set to 0. What it does is represent what package the user has bought:
+- 0 = none
+- 1 = cheap package
+- 2 = expensive package
+
+This can then be used to only allow the user to access certain content, if he ahs bought the according package.
+Our ``payment_required`` decorator does exactly this:
+
+```python db.py
+def payment_required(func):
+    @wraps(func)
+    def decorated_func(*args, **kwargs):
+        logged_in, payed = check_user_status()
+
+        if logged_in and payed:
+            return func(*args, **kwargs)
+        
+        if logged_in and not payed:
+            return redirect("/")
+
+        return redirect("/authenticate")
+
+    return decorated_func
+```
+
+The check_user_status only returns True, if the user has a "package_id" that is higher than 0.
+When the user buys a package, we change the "package_id" in his Item to the according number, using our
+``set_user_package`` function. To see when and how it is invoked, read the next chapter on payments.

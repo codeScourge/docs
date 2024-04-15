@@ -2,17 +2,126 @@
 title: "Payments"
 ---
 
-It works by creating a webhook (an endpoint for Stripe to send information to). 
-Once you have a dedicated IP-adress where you host your application or even a domain, 
-you can configure it as the webhook endpoint on inside Stripe. For now we can pool the 
-connection and redirect it to our webhook route by running ``stripe listen --forward-to 
-localhost:8080/payment/stripe/webhook`` in another terminal. Note how this domain is structured, 
-port 8080 is the one open in local (NOT DOCKER) development, if you change the route, reflect 
-it in the command.
+If you want to make money, you need to charge users. Thankfully, this is as easy as ever. Providers like 
+Stripe take care of processing payments with any method imaginable. Simply create an account on Stripe, this
+will have test mode enabled by default, meaning you can pay here without being charged. Also make sure you have
+the Stripe CLI (see installation) installed, we will need it later
 
-Once the user is logged in and ready to buy, he can be redirected to "/payment/checkout/package_id". 
-Here he is redirected to a page hosted on Stripe where he can pay.  
+Once again, we don't have to build our own page.
+We Simply redirect the user to Stripe, where he can pay and come back to our site. 
 
-We configured the checkout creation such a way, that once the payment has gone through, Stripe 
-sends us a request to our webhook containing the users email (by which we can identify him in out 
-DynamoDB, since it's the primary key), as well as the package he bought.
+In the background, stripe will charge the user, and will inform us when certain events like
+a successfull or canceled payment happens, by communicating with our webhook. A webhook is simply said
+an endpoint where Stripe can send a request to. Open ``payment_bp.py`` and take a look at the "/stripe/webhook" route:
+
+```python payment_bp.py
+# --- Webhook ---
+@payment_bp.post("/stripe/webhook")
+def stripeWebhookRoute():
+    payload = request.data
+    sig_header = request.headers['STRIPE_SIGNATURE']
+
+
+    # verify event signature (so that only stripe can send you events)
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, os.getenv("STRIPE_ENDPOINT_SECRET"))
+    except ValueError as e:
+        raise f"Invalid Payload: {e}"
+    except stripe.error.SignatureVerificationError as e:
+        raise f"Invalid Signature: {e}"
+    
+
+    # handle events
+    if event["type"] == "payment_intent.requires_action":
+        pass
+
+    elif event["type"] == "payment_intent.created":
+        pass
+
+    elif event["type"] == "payment_intent.succeeded":
+        pass
+
+    elif event["type"] == "charge.succeded":
+        pass
+
+    elif event["type"] == "checkout.session.completed":
+        package_id = event["data"]["object"]["metadata"]["package_id"]
+        email = event["data"]["object"]["metadata"]["email"]
+        info_log(f"Webhook received, that user with email {email} has bought package number {package_id}")
+        set_user_package(email, package_id)
+        # TODO: email to user about success
+
+    elif event["type"] in ["charge.failed", "payment_intent.failed"]:
+        # TODO: email to user about failure
+        pass
+
+    else:
+      error_log('Unhandled event type {}'.format(event['type']))
+
+
+    return jsonify(success=True)
+```
+
+Here we receive a message from Stripe and first validate it using our STRIPE_ENDPOINT_SECRET, which you will
+have to set inside ``.env``. This ensures, that only Stripe can send to this endpoint and mark our user as payed,
+which we do in our ``set_user_package`` function. As you can see, we can retrieve information about 
+- which user has bought something (email)
+- which package that user has bought (package_id)
+
+Both of this is set when creating the Checkout Session in "/checkout":
+
+```python payment_bp.py
+@payment_bp.get("/checkout/<int:package_id>")
+@login_required
+def checkoutRoute(package_id:int=1):
+    # check if already bought something
+    _, payed = check_user_status()
+    if payed:
+        info_log("User has already payed")
+        return redirect("/home/payed")
+    
+
+    email = session.get("email")
+    info_log(f"Creating Checkout for user with email {email} buying package number {package_id}")
+
+
+    checkout_session = stripe.checkout.Session.create(
+        payment_method_types=["card", "paypal"],
+        line_items=[{"price": stripe_packages[package_id], "quantity": 1}],
+        mode="payment",
+        success_url=f"{request.host_url}payment/thanks" + "?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url=f"{request.host_url}payment/cancel",
+        metadata={
+            "email": email,
+            "package_id": package_id
+        }
+    )
+
+    return redirect(checkout_session.url)
+``` 
+
+What is also interesting is the line_items key. Here we will need to provide an id of an item which we create in Stripe
+under More -> Product Catalog
+
+<img src="../images/stripe_catalog.png"/>
+
+Once you have created two products (one for each package) and have thereby set information such as price, you can
+add it to our ``stripe_packages`` array and map the items to their "package_ids"
+
+```python payment_bp.py
+stripe_packages = {
+    1: "price_1P2XOJHiXO1FchHrFQov9nyc",
+    2: "price_1P3JpiHiXO1FchHrY4BbhmXW"
+}
+```
+
+Lets get back to the webhook part. How does Stripe know where it is located? Once you have deployed your application at it
+is accessible on the World Wide Web (www), you can set the IP or domain name of it inside the Stripe Settings. While we work
+locally, however, we will use a technique called pooling. This means we will regularly ping the Stripe servers and see if any
+updates came through. This is made possible using the Stripe CLI.
+```bash
+stripe listen --forward-to localhost:8080/payment/stripe/webhook
+```
+This command will forward the Stripe Requests to our application running locally on port 8080. Note that this is the case
+when running locally using ``bash local.sh`` and not while inside Docker (see structure).
+

@@ -7,6 +7,8 @@ Everyone else on the other hand is being left behind. In a world where you can g
 application up and running with ONE command, we have to fight to set up Webpack or give up and
 live with vanilla JavaScript. 
 
+<img src="../images/supabase.jpg"/>
+
 The same is true for deployment: connect your repository to Vercel, and you have a fully managed 
 application running with everything you could ever need. But thats boring, I would rather
 dockerize my applications, setup Nginx and Gunicorn, Deploy everything to AWS while figuring out which of
@@ -20,10 +22,10 @@ ever more important
 So what is this, and how does it solve these problems?
 This is all the boilerplate you will need for a whole Product, not Project. Besides the development
 environment which allows you to quickly develop using Flask, ReactJS and Bun, it has:
-- a databaseso you can save users
-- payments so these can pay for your product
-- authentification so they can access the bough product
-- and (soon) emails so you can do marketing based on the analytics we are going to implement.
+- a **database**, so you can save users
+- **payments**, so these can pay for your product
+- **authentification**, so they can access the bough product
+- and (soon) **emails**, so you can do marketing based on the analytics we are going to implement.
 
 Obviosly you don't want to self-host this application on your laptop. That is why
 everything is configured so you can quickly and cheaply deploy to AWS - doesn't matter if you want
@@ -33,8 +35,6 @@ microservices through orchestrated Docker containers or serverless Lambda functi
 What do you need to know before you start? I expect you to be a Flask developer familiar with modern 
 JavaScript: you need to know how package managers and bundling work. Specifically you should know ReactJS
 and optionally (but highly recommend) TailwindCSS. 
-
-# (* add plug here to my course *)
 
 You should also know the basics of how data is stored with databases.
 
