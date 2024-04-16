@@ -1,0 +1,14 @@
+---
+title: "Emails"
+---
+Programmatic emails are a pain in the ass. Modern tools make it slightly better.
+Instead of writing HTML tables, we  can now use an open-source library called 
+[React Email](https://github.com/resend/react-email).
+Here we can define our email structure with beatifully styled React components and then compile them into a plain HTML
+file. This file can then be used by our Flask backend to send it to users through SES.
+
+
+### Setting up SES
+Already have a Domain? If not, now you will need one. Buy one directly in AWS or "import" it to Route53 using nameservers. 
+For example if you have bought your domain from GoDaddy, follow [this video](https://www.youtube.com/watch?v=hRSj2n-XKGM),
+the process is fairly similar at other providers. 

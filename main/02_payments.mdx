@@ -32,17 +32,7 @@ def stripeWebhookRoute():
     
 
     # handle events
-    if event["type"] == "payment_intent.requires_action":
-        pass
-
-    elif event["type"] == "payment_intent.created":
-        pass
-
-    elif event["type"] == "payment_intent.succeeded":
-        pass
-
-    elif event["type"] == "charge.succeded":
-        pass
+    ...
 
     elif event["type"] == "checkout.session.completed":
         package_id = event["data"]["object"]["metadata"]["package_id"]
@@ -125,3 +115,5 @@ stripe listen --forward-to localhost:8080/payment/stripe/webhook
 This command will forward the Stripe Requests to our application running locally on port 8080. Note that this is the case
 when running locally using ``bash local.sh`` and not while inside Docker (see structure).
 
+As you might remember, we used the ``send_email`` functions to notify the user about his payments going through or being
+cancelled. Read the next chapter on emails to see how we accomplish this
