@@ -50,9 +50,17 @@ def get_dynamo_table():
 dynamo_table = LocalProxy(get_dynamo_table)
 ``` 
 
-To do that we use the AWS SDK for Python boto3. This requires that you have setup the AWS-CLI (see installation).
-What follows are a bunch of helper functions, including the ``add_user`` function I mentioned in the last chapter.
+To do that we use the AWS SDK for Python called boto3. Boto3 has [multiple ways of authenticating itself](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html).
+If the AWS-CLI is configured, it will pull the credentials from there, otherwise we will need to provide them manually
+or set them as environment variables, which we are going to do for deployment and security reasons.
 
+To do that, follow [this video](https://www.youtube.com/watch?v=fwtmTMf53Ek) to create a pair of access keys. 
+I recommend you to use administrator access while developing and switch to the minimum
+rights when deploying to production, so that in case of a leak, the rest of your ressources will be intact.
+Set ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY_ID`` in your ``.env`` file.
+
+What follows is a bunch of helper functions, including the ``add_user`` 
+function I mentioned in the last chapter.
 
 ```python db.py
 def add_user(email:str):
@@ -72,7 +80,7 @@ We use a "ConditionExpression" to only add a user, if he does not yet exist. As 
 - 1 = cheap package
 - 2 = expensive package
 
-This can then be used to only allow the user to access certain content, if he ahs bought the according package.
+This can then be used to only allow the user to access certain content, if he has bought the according package.
 Our ``payment_required`` decorator does exactly this:
 
 ```python db.py

@@ -63,15 +63,17 @@
       "pages": [
         "main/00_authentication",
         "main/01_database",
-        "main/02_payments"
+        "main/02_payments",
+        "main/03_email"
       ]
     },
     {
       "group": "Deployment",
       "pages": [
         "deployment/00_overview",
-        "deployment/01_lambda",
-        "deployment/02_docker"
+        "deployment/01_docker",
+        "deployment/02_lambda",
+        "deployment/03_ecs"
       ]
     }
   ],

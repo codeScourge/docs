@@ -11,4 +11,21 @@ file. This file can then be used by our Flask backend to send it to users throug
 ### Setting up SES
 Already have a Domain? If not, now you will need one. Buy one directly in AWS or "import" it to Route53 using nameservers. 
 For example if you have bought your domain from GoDaddy, follow [this video](https://www.youtube.com/watch?v=hRSj2n-XKGM),
-the process is fairly similar at other providers. 
+the process is fairly similar at other providers. We will now go to AWS SES and configure an identity. This can either
+be single email adress (a@test.com) or a domain (test.com) which allows us to send and receive emails on all the possible
+adresses. 
+
+Follow [this video](https://www.youtube.com/watch?v=VWt43MXhuk4) to create
+an identity and get some credentials
+
+Now there are two ways of sending emails: through the SMTP interface
+and simply using the SDK. For our internal emails for when the payment goes
+through for example, we will simply use the SDK. If you want to do propper
+Marketing, you will need a propper interface with all the features like
+lists, templates, and similar. 
+
+You could use a managed overpriced solution like MailChimp, but fortunately,
+SES has got our back. There is plenty of software which will send emails through
+SES and by that save you money. 
+
+
