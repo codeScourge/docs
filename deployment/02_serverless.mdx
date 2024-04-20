@@ -1,0 +1,18 @@
+---
+title: "Serverless"
+---
+
+
+
+If you simply deploy to SLS, you WILL get a domain-name, but it will be random piece of characters.
+Instead we will add our domain, which we configured in the email chapter.
+For that we will use [an SLS plugin](https://www.serverless.com/plugins/serverless-aws-function-url-custom-domain),
+which means we will only have to setup a certificate in the AWS Certificate Manager.
+
+
+Follow [this video](https://www.youtube.com/watch?v=JIKmsr1kuUo), while skipping the step of buying a new domain.
+It is CRUCIAL to create this in the "us-east-1" / "North Virginia" Region (unlike Route53, Certificate Manager isn't global).
+
+I don't know why yet, but I will let you know
+
+
