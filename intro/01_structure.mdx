@@ -2,78 +2,81 @@
 title: "Project Structure"
 ---
 
+### development files
 Let's start with the big picture: the project structure.
 
-Open the ``backend`` folder.
+Open the `backend` folder.
 As a Flask developer you will immediately see a familiar pattern:
-- a ``static`` folder holding your CSS and JS
-- a ``templates`` with your HTML Jinja templates
-- our Flask application in ``app.py``
-- a ``requirements.txt`` file for our python dependencies
-- a ``gunicorn_config.py`` file which configures our Gunicorn WSGI
+- a `static` folder holding your CSS and JS
+- a `templates` with your HTML Jinja templates
+- our Flask application in `app.py`
+- a `requirements.txt` file for our python dependencies
+- a `gunicorn_config.py` file which configures our Gunicorn WSGI
 - a Dockerfile to containarize the application for easier development and deployment
+- a `static` folder holding the bundled `.js` and `.css` files, they will be imported in our HTML
+- a `serverless.yml` file which defines our IAS (Infrastructure As Code), we will use it later to deploy a Lambda function
 
-One thing is missing though: the ``.env`` file. Create one in the ``backend`` folder, we will fill it
-throughout the documentation.
+One thing is missing though: the ``.env`` file. You will see an ``.env.example`` file with keys and empty values.
+Rename it to `.env` and fill it with the according values througout the rest of this documentation.
 
-If you open the ``static`` we see another familiar pattern: src (source) and
-dist (distination). When bundling our JavaScript, the raw code is being transpiled into a clean bundle and 
-copied from src to dist. After that we can simply import it into our HTML just like any other JavaScript.
-
-```html landing.html
-<script src="{{ url_for('static', filename='dist/landing.js') }}" defer></script>
-```
-
-How is it done? Open ``bundle.js`` in our root directory. Here we can see how Bun
-tracks defined JavaScript files and creates bundles with the same name.
-
-```js bundle.js
-await Bun.build({
-    entrypoints: [
-        "./backend/static/source/authenticated_home.js", 
-        "./backend/static/source/payed_home.js", 
-        "./backend/static/source/landing.js"
-    ],
-    outdir: "./backend/static/dist/",
-})
-```
-Try executing this file with ``bun build.js``. 
-It is also defined as a script in our ``package.json`` and can be ran using ``bun run build``.
-
+Now let's look at the most interesting part: the bundling.
+Open `package.json` and take a look at:
 ```json package.json
   "scripts": {
-    "build": "bun build.js",
-    "tailwind": "bunx tailwindcss -i ./backend/static/source/globals.css -o ./backend/static/dist/tailwind.css",
-    "watch-tailwind": "bunx tailwindcss -i ./backend/static/source/globals.css -o ./backend/static/dist/tailwind.css --watch"
+    "watch-js": "node build.mjs",
+    "watch-css": "postcss ./src/css/*.css --dir ./backend/static/css --watch",
+    "build-css": "postcss ./src/css/*.css --dir ./backend/static/css",
+    "watch": "npm-run-all --parallel watch-css watch-js"
   },
 ```
- 
-In here you also see another command: tailwind. By calling ``bun run tailwind`` we can transpile our
-``globals.css`` file to create ``output.css`` .
+You can run `watch-css`, `watch-css` or `watch` to watch and bundle the corresponding file types.
+As you can see we use PostCSS and a `build.mjs` file to transpile our content from our `src` to our `static` folder.
+Open `postcss.config.js`, here you can see the plugins that we use to:
+- allow importing other `.css` files
+- reduce our bundle size to a minimum
+- use modern CSS features while making the bundle usable by legacy browsers
 
-It is imported in our ``_base.html``, snce this is our Base Template, ``output.css`` is used in HTML file 
-that inherits from it. 
-
-Open ``tailwind.config.js`` in root. Here we can see that Tailwind scans our ``backend/templates`` folder for HTML and
-``backend/static/source`` for JS, for tracking which classes are used and only including them in the output file. 
-On a side note: ``globals.css`` also holds custom defined CSS for styling most of ``base.html``.
-
-``` js, tailwind.config.js
-/** @type {import('tailwindcss').Config} */
+```js postcss.config.js
 module.exports = {
-  content: [
-    "./backend/static/source/**/*.{js,jsx,ts,tsx}",
-    "./backend/templates/**/*.{html}"
-  ],
+    plugins: [
+        require('postcss-import'),
+        require('cssnano')({ // https://github.com/cssnano/cssnano
+            preset: 'default',
+        }),
+        require('postcss-preset-env')({ // https://preset-env.cssdb.org/features/
+            stage: 2
+        })
+    ],
+};
+```
+
+Now take a look at the `build.mjs` file. Here we define the files that should be bundled. Then we loop over each of them
+and start watching them for changes, when one occurs we create bundle with the same name.
+```js build.mjs
+import * as esbuild from 'esbuild'
+
+const srcDir = "./src/js/"
+const distDir = "./backend/static/js/"
+const entryPoints = ["authenticated_home.jsx", "payed_home.jsx", "landing.jsx"];
+
+for (const entryPoint of entryPoints) {
+  let ctx = await esbuild.context({
+    entryPoints: [srcDir + entryPoint],
+    outfile: `${distDir}${entryPoint.split('.')[0]}.js`,
+    bundle: true,
+  });
+
+  await ctx.watch();
+  console.log(`Watching ${entryPoint}...`);
 }
 ```
 
-Another thing you might notice is the ``nginx`` folder, which holds all the Configuration for our web server. 
-At the root you can see the Dockerfile for that.
+### deployment files
+Besides the Dockerfile in `backend` we have a few more files, which we will need for deploying our Docker containers in a
+provisioned way, for example the `nginx` folder, which holds all the Configuration for our web server. 
+In the root dir you can see the Dockerfile for that.
 When building, Docker copies the static files and serves them through Nginx
-instead of our Flask application, since this is way more efficient.
+instead of our Flask application, since this is more efficient.
 
-Besides that we have a ``docker-compose.yml`` and ``serverless.yml`` file, you will learn about them in our deployment 
-chapters.
+Besides that we have a ``docker-compose.yml`` file, for managing multiple Docker containers and making the communicate.
 
-# here something about the email folder we will hopefully have

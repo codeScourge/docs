@@ -4,7 +4,7 @@ title: "Installation / Setup"
 
 ### Requirements
 While developing you will need:
-- [Bun](https://bun.sh/docs/installation)
+- [Node and NPM](https://nodejs.org/en/download)
 - [Python](https://www.python.org/downloads/)
 - [Stripe CLI](https://docs.stripe.com/stripe-cli)
 
@@ -15,16 +15,11 @@ For deployment install:
 
 
 ### Running the application
-Almost done, before we start, we will need to bundle our static files.
-Since they are not tracked by git you will have to run this after a fresh pull:
-- ``bun run build`` for JS
-- ``bun run tailwind`` for CSS
-
-
 Once we are done with configuration, you will have two choices to start the app:
 - WHEN WORKING LOCALLY: ``bash local.sh`` will start a local (!DEVELOPMENT!) server which listens on Port 8080
 or
-- WHEN DEPLOYING: ``bash docker.sh`` will run the same application with production ready Nginx
+- WHEN DEPLOYING: ``bash docker.sh`` will run the same application with a propper WSGI and
+a production-ready Nginx web-server
 
 Before we can do that, there is just a bit more configuration to do:
 - Setup and connect our database
