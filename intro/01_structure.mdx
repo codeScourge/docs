@@ -1,10 +1,10 @@
 ---
 title: "Project Structure"
+icon: excavator
 ---
-
-### development files
 Let's start with the big picture: the project structure.
 
+### development files
 Open the `backend` folder.
 As a Flask developer you will immediately see a familiar pattern:
 - a `static` folder holding your CSS and JS
@@ -16,9 +16,26 @@ As a Flask developer you will immediately see a familiar pattern:
 - a `static` folder holding the bundled `.js` and `.css` files, they will be imported in our HTML
 - a `serverless.yml` file which defines our IAS (Infrastructure As Code), we will use it later to deploy a Lambda function
 
+### secrets
 One thing is missing though: the ``.env`` file. You will see an ``.env.example`` file with keys and empty values.
-Rename it to `.env` and fill it with the according values througout the rest of this documentation.
+Rename it to `.env.local` and fill it with the according values througout the rest of this documentation. When 
+you are ready to deploy to production, you will create a `.env` file and copy the info there.
 
+Open `app.py`, you will see that if we run the file locally with `bash local.sh`, we will
+use the `.env.local` file, otherwise we use the default `.env` file.
+```python app.py
+if __name__ == "__main__":
+    dotenv.load_dotenv(".env.local")
+    print("Loading development environment", flush=True)
+else:
+    dotenv.load_dotenv(".env")
+    print("Loading production environment", flush=True)
+```
+
+Over the course I will refer to both as the `.env` file, use the one according
+to your current stage
+
+### bundling
 Now let's look at the most interesting part: the bundling.
 Open `package.json` and take a look at:
 ```json package.json

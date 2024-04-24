@@ -1,7 +1,8 @@
 ---
 title: "Payments"
+icon: credit-card
 ---
-
+### Stripe
 If you want to make money, you need to charge users. Thankfully, this is as easy as ever. Providers like 
 Stripe take care of processing payments with any method imaginable. Simply create an account on Stripe, this
 will have test mode enabled by default, meaning you can pay here without being charged. Also make sure you have
@@ -10,6 +11,7 @@ the Stripe CLI (see installation) installed, we will need it later
 Once again, we don't have to build our own page.
 We Simply redirect the user to Stripe, where he can pay and come back to our site. 
 
+# building our webhook
 In the background, stripe will charge the user, and will inform us when certain events like
 a successfull or canceled payment happens, by communicating with our webhook. A webhook is simply said
 an endpoint where Stripe can send a request to. Open ``payment_bp.py`` and take a look at the "/stripe/webhook" route:
@@ -31,22 +33,51 @@ def stripeWebhookRoute():
         raise f"Invalid Signature: {e}"
     
 
-    # handle events
-    ...
+    # user has finished checkout but payment might not have gone through yet
+    if event["type"] == "checkout.session.completed":
+        current_app.logger.info("User has finished the checkout")
 
-    elif event["type"] == "checkout.session.completed":
+    # when the payment has gone through successfully
+    elif event["type"] == "payment_intent.succeeded":
         package_id = event["data"]["object"]["metadata"]["package_id"]
         email = event["data"]["object"]["metadata"]["email"]
-        info_log(f"Webhook received, that user with email {email} has bought package number {package_id}")
-        set_user_package(email, package_id)
-        # TODO: email to user about success
+        charge_id = event["data"]["object"]["latest_charge"]
+        current_app.logger.info(f"Webhook received, that user with email {email} has bought package number {package_id}")
 
-    elif event["type"] in ["charge.failed", "payment_intent.failed"]:
-        # TODO: email to user about failure
-        pass
+        try:
+            set_user_package(email, package_id)
+            
+        except Exception as e:
+            stripe.Refund.create(charge=charge_id)
+            current_app.logger.error(f"Error setting user package for email {email}: {str(e)}. Charge {charge_id} refunded.")
+            send_plain_email(
+                email_adress=email,
+                subject="Order Processing Error",
+                text=REFUND_TEXT
+            )
+            
+            return jsonify(success=True)
+            
+        current_app.logger.info(f"Webhook received, that user with email {email} has bought package number {package_id}")
+        send_plain_email(
+                email_adress=email,
+                subject="You are ready to ship!",
+                text=SUCCESS_TEXT
+            )
 
+
+    # when a payment failed
+    elif event["type"] == "payment_intent.payment_failed":
+        email = event["data"]["object"]["metadata"]["email"]
+        send_plain_email(
+            email_adress=email,
+            subject="Your payment didn't go through :(",
+            text=CANCEL_TEXT
+        )
+
+    # other events
     else:
-      error_log('Unhandled event type {}'.format(event['type']))
+      current_app.logger.error(f"Unhandled event type {event['type']}")
 
 
     return jsonify(success=True)
@@ -58,6 +89,8 @@ which we do in our ``set_user_package`` function. As you can see, we can retriev
 - which user has bought something (email)
 - which package that user has bought (package_id)
 
+
+# creating the checkout
 Both of this is set when creating the Checkout Session in "/checkout":
 
 ```python payment_bp.py
@@ -84,6 +117,12 @@ def checkoutRoute(package_id:int=1):
         metadata={
             "email": email,
             "package_id": package_id
+        },
+        payment_intent_data={
+            "metadata": {
+                "email": email,
+                "package_id": package_id
+            }
         }
     )
 
@@ -93,27 +132,36 @@ def checkoutRoute(package_id:int=1):
 What is also interesting is the line_items key. Here we will need to provide an id of an item which we create in Stripe
 under More -> Product Catalog
 
-<img src="../images/stripe_catalog.png"/>
+<img src="../images/stripe_catalog.png"/ alt="product tab in Stripe">
 
 Once you have created two products (one for each package) and have thereby set information such as price, you can
-add it to our ``stripe_packages`` array and map the items to their "package_ids"
+add it to our ``stripe_packages`` array and map the items to their "package_ids". Create two of those products and
+add them to the `.env` file.
 
 ```python payment_bp.py
 stripe_packages = {
-    1: "price_1P2XOJHiXO1FchHrFQov9nyc",
-    2: "price_1P3JpiHiXO1FchHrY4BbhmXW"
+    1: os.getenv("STRIPE_PACKAGE_ONE, ""),
+    2: os.getenv("STRIPE_PACKAGE_ONE, "")
 }
 ```
 
+### connecting Stripe to our webhook
 Lets get back to the webhook part. How does Stripe know where it is located? Once you have deployed your application at it
 is accessible on the World Wide Web (www), you can set the IP or domain name of it inside the Stripe Settings. While we work
 locally, however, we will use a technique called pooling. This means we will regularly ping the Stripe servers and see if any
 updates came through. This is made possible using the Stripe CLI.
+
 ```bash
 stripe listen --forward-to localhost:8080/payment/stripe/webhook
 ```
+
 This command will forward the Stripe Requests to our application running locally on port 8080. Note that this is the case
 when running locally using ``bash local.sh`` and not while inside Docker (see structure).
+
+Later once we have deployed to a domain, you can provide the URL to your webhook inside 
+the Stripe interface.
+When an event occurs, Stripe will automatically
+send a request there, without you needing to use the Stripe CLI.
 
 As you might remember, we used the ``send_email`` functions to notify the user about his payments going through or being
 cancelled. Read the next chapter on emails to see how we accomplish this

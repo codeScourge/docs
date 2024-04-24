@@ -1,7 +1,9 @@
 ---
 title: "Database"
+icon: database
 ---
 
+### why DynamoDB?
 RDBs (Relational Databases) have been dominating the space since the 80s. Back then the main concern 
 was storage, which is why RDBs are designed to avoid duplication by normalizing data. 
 As you might guess, compute is now the major bottleneck. 
@@ -25,6 +27,7 @@ If this is the first time leaving the world of RDBs, the whole mindset of buildi
 quite confusing. However, getting used to it is definetily worth it.
 Check out [this webinar on modeling data](https://www.youtube.com/watch?v=XMEkNZby95M) before you continue.
 
+### setting up the database
 Now we will set up your database. While we could have done so programmatically in our IAS (Infrastructure
 as Code) template, I prefer not accidentaly delete my database when playing around in the CLI (I am speaking from experience).
 
@@ -32,9 +35,15 @@ For this follow the steps shown in [this Introduction to DynamoDB](https://www.y
 and manually create a table. Otherwise you can follow [this video](https://www.youtube.com/watch?v=vHeYz-C9hSk&list=PL9nWRykSBSFi5QD8ssI0W5odL9S0309E2&index=12)
 and deploy it locally, but you will have to change the code accordingly.
 
+<img src="../images/dynamo-attributes.png" alt="attributes of our DynamoDB table"/>
+
+**! choose one region which you will use for all of your ressources from now on ! **
+
 Set the primary key as email and leave the search key empty, as this is how we are going to find our users. Also
 add a string property called ``package_id``, more on this later.
 
+
+### interacting through code
 Now lets dive into the code and see how we interact with our database. 
 Open ``backend/db.py`. 
 As you can see, we establish a connection to our table based on its name, which is saved in an environment variable.
@@ -52,12 +61,7 @@ dynamo_table = LocalProxy(get_dynamo_table)
 
 To do that we use the AWS SDK for Python called boto3. Boto3 has [multiple ways of authenticating itself](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html).
 If the AWS-CLI is configured, it will pull the credentials from there, otherwise we will need to provide them manually
-or set them as environment variables, which we are going to do for deployment and security reasons.
-
-To do that, follow [this video](https://www.youtube.com/watch?v=fwtmTMf53Ek) to create a pair of access keys. 
-I recommend you to use administrator access while developing and switch to the minimum
-rights when deploying to production, so that in case of a leak, the rest of your ressources will be intact.
-Set ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY_ID`` in your ``.env`` file.
+or set them as environment variables.
 
 What follows is a bunch of helper functions, including the ``add_user`` 
 function I mentioned in the last chapter.

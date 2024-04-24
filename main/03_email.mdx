@@ -1,12 +1,13 @@
 ---
 title: "Emails"
+icon: envelope
 ---
 
 Emails are important to communicate with your users. We will not set up an email list management tool here, 
 these will be transactional emails. For that we will go back to AWS of course - SES (Simple Email Service)
 is here to help!
 
-<img src="../images/mail-pricing.png"/>
+<img src="../images/mail-pricing.png"/ alt="SES compared to mailchimp in cost">
 
 
 ### Setting up SES
@@ -74,6 +75,8 @@ def send_html_email(email_adress:str, subject:str, html_string:str):
 ```
 
 Do not forget to fill the "FROM_EMAIL" key to `.env`, it has to match the identity you created.
+For example if I have created a global identity for ivanbokarev.top, I can
+use any adress like info@ivanbokarev.top
 
 
 ### Writing the Email HTML
