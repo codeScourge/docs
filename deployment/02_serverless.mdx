@@ -27,7 +27,7 @@ Other possible events are:
 - sheduler (f.e. every 10 minutes)
 - SQS (Simple Queue Service by AWS)
 
-<img src="../images/lambda.png"/ alt="lambda and api-gateway interaction">
+<img src="../images/lambda.png" alt="lambda and api-gateway interaction"/>
 
 Besides that we get integrated logs using AWS CloudWatch.
 
@@ -125,7 +125,7 @@ For that we will have to set 3 more keys in our `.env` file:
 - certificateArn should be the ARN (Amazon Ressource Name) for the certificate you just created
 
 Now you can call `sls create_domain`. This will use the set information to create the new Domain.
-<img src="../images/api-domain.png"/ alt="domain tap in API gateway">
+<img src="../images/api-domain.png" alt="domain tap in API gateway"/>
 If you want to delete it again (after you have already removed the Lambda function with `sls remove`), you 
 can simply call `sls delete_domain`
 

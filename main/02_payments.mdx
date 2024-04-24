@@ -6,7 +6,10 @@ icon: credit-card
 If you want to make money, you need to charge users. Thankfully, this is as easy as ever. Providers like 
 Stripe take care of processing payments with any method imaginable. Simply create an account on Stripe, this
 will have test mode enabled by default, meaning you can pay here without being charged. Also make sure you have
-the Stripe CLI (see installation) installed, we will need it later
+the Stripe CLI (see installation) installed, we will need it later.
+
+Get the STRIPE_SECRET_KEY and add it to your `.env` file
+<img src="../images/stripe-sk.png" alt="secret key in Stripe"/>
 
 Once again, we don't have to build our own page.
 We Simply redirect the user to Stripe, where he can pay and come back to our site. 
@@ -84,10 +87,19 @@ def stripeWebhookRoute():
 ```
 
 Here we receive a message from Stripe and first validate it using our STRIPE_ENDPOINT_SECRET, which you will
-have to set inside ``.env``. This ensures, that only Stripe can send to this endpoint and mark our user as payed,
-which we do in our ``set_user_package`` function. As you can see, we can retrieve information about 
+have to set inside ``.env``. This ensures, that only Stripe can send to this endpoint
+
+<img src="../images/stripe-wk.png" alt="webhook key in Stripe"/>
+
+After that we handle events accordingly like:
+- sending an email 
+- calling ``set_user_package`` function (or refunding if it fails)
+
+
+As you can see, we can retrieve information about 
 - which user has bought something (email)
 - which package that user has bought (package_id)
+from the metadata.
 
 
 # creating the checkout
@@ -132,7 +144,7 @@ def checkoutRoute(package_id:int=1):
 What is also interesting is the line_items key. Here we will need to provide an id of an item which we create in Stripe
 under More -> Product Catalog
 
-<img src="../images/stripe_catalog.png"/ alt="product tab in Stripe">
+<img src="../images/stripe_catalog.png" alt="product tab in Stripe"/>
 
 Once you have created two products (one for each package) and have thereby set information such as price, you can
 add it to our ``stripe_packages`` array and map the items to their "package_ids". Create two of those products and
@@ -160,8 +172,11 @@ when running locally using ``bash local.sh`` and not while inside Docker (see st
 
 Later once we have deployed to a domain, you can provide the URL to your webhook inside 
 the Stripe interface.
-When an event occurs, Stripe will automatically
-send a request there, without you needing to use the Stripe CLI.
+When an event occurs, Stripe will automatically send a request there, without you needing to use the Stripe CLI. 
+There you will have the option to receive only the events you need, these are:
+- `checkout.session.completed` to see when the user filled out the checkout from
+- `payment_intent.succeeded` to see when the payment has actually gone through
+- `payment_intent.failed` if the payment failed
 
 As you might remember, we used the ``send_email`` functions to notify the user about his payments going through or being
 cancelled. Read the next chapter on emails to see how we accomplish this
