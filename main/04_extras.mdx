@@ -75,3 +75,25 @@ get a bunch of different files, I will just let ChatGPT explain:
 <img src="../images/favicon-gpt.png" alt="explanation on different favicons by ChatGPT"/>
 
 Simply extract the metioned files into ``static/assets/favicon``    
+
+
+### Security
+To cover most security considerations, we use an amazing Plugin called ["Flask Talisman"](https://github.com/GoogleCloudPlatform/flask-talisman)
+We simply wrap our application and pass any custom settings. I highly recommend to check out their ReadMe to
+understand what it is you are actually doing under the hood.
+
+One of these customizations, is the "Content Security Policy" header. It defines, from where our HTMl can load
+content from. By default, it is our server. When later deploying the application, we will serve our static
+content through a CDN, so we whitelist it as a valid origin.
+
+```python app.py
+csp = {
+    'default-src': [
+        '\'self\'',
+    ],
+}
+if os.getenv("CDN_DOMAIN", None):
+    csp["default-src"].append(os.getenv("CDN_DOMAIN"))
+
+Talisman(app, content_security_policy=csp)
+```

@@ -25,16 +25,21 @@
   ],
 
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Get Now!",
+    "url": "https://ivanbokarev.top/payment/checkout/2"
   },
 
 
   "anchors": [
     {
-      "name": "Landing",
-      "icon": "paperclip",
+      "name": "Purchase",
+      "icon": "cart-shopping",
       "url": "https://ivanbokarev.top"
+    },
+    {
+      "name": "Repo (if bought)",
+      "icon": "github",
+      "url": "https://github.com/codeScourge/ShipPil"
     }
   ],
 

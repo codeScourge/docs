@@ -1,6 +1,6 @@
 ---
 title: "Emails"
-icon: envelope
+icon: envelope  
 ---
 
 Emails are important to communicate with your users. We will not set up an email list management tool here, 
@@ -91,3 +91,8 @@ file. You can easily implement this yourself by following their documentation
 The setup we have is for sending emails only. You can configure SES to handle emails:
 - programmaticaly (it will trigger a Lambda function which performs code and has access to the email)
 - like an inbox with an AWS Workmail setup
+
+### Production access
+If you now try to send an email to a different domain, it will fail. The reason is, that SES requires a manual
+check, before they allow you to send emails. This is to avoid malicious activity. For requesting access follow
+[this comprehensive video](https://www.youtube.com/watch?v=WYEEZPkv750&t=368s)
