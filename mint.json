@@ -67,9 +67,8 @@
       "group": "Deployment",
       "pages": [
         "deployment/00_overview",
-        "deployment/01_docker",
-        "deployment/02_serverless",
-        "deployment/03_provisioned"
+        "deployment/01_serverless",
+        "deployment/02_provisioned"
       ]
     }
   ],
