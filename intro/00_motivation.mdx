@@ -1,5 +1,5 @@
 ---
-title: "Introduction / Motivation"
+title: "Motivation"
 icon: brain
 ---
 
@@ -10,15 +10,12 @@ so you will master this techstack and workflow in no time!
 
 
 ### I am tired 
-In recent years the Web Development landscape has changed drastically: ever newer tools 
-allow for easier and faster shipment of your application. On the forefront: JavaScript.
-Everyone else however, is being left behind. In a world where you can get a NextJS
-application up and running with ONE command, we have to fight to set up Webpack or give up and
-live with vanilla JavaScript. 
+In a world where you can get a NextJS application up and running with ONE command, 
+we have to fight with Webpack or give up and live with vanilla JavaScript. 
 
-The same is true for deployment: connect your repository to Vercel, and you have a fully managed 
+Connect your repository to Vercel, and you have a fully managed 
 application running with everything you could ever need. But thats boring, I would rather
-dockerize my applications, setup Nginx and Gunicorn, Deploy everything to AWS while figuring out which of
+dockerize my applications, setup my webserver and WSGI, and deploy everything manually to AWS while figuring out which of
 more than 200 services I need to use. Don't forget about domains, oh and also ... just like ...
 
 You see where I am going. While the temptation to switch to JavaScript is high, Python is still my backend of choice.
@@ -30,11 +27,8 @@ are becoming ever more important.
 ### How ShipPil tries to solve this
 So what is this?
 This is all the boilerplate you will ever need for a Product, not just a Project. Besides the development
-environment which allows you to quickly develop using Flask, ReactJS, ES-build, and PostCSS , it has:
-- **database**
-- **authentification**
-- **payments**
-- **emails**
+environment which allows you to quickly develop using Flask, ES-build, PostCSS, and a frontend of your choice, it has: 
+a **database**, **authentification**, **payments**, and **emails**.
 
 Obviosly you don't want to self-host this application on your laptop. That is why
 everything is configured so you can *quickly and cheaply deploy*:
@@ -45,13 +39,15 @@ What do you need to know before you start? I expect you to be a Flask developer 
 JavaScript: you need to know how package managers and bundling work. You should also know how Flask, WSGIs and 
 web servers interact under the hood.
 Thats it, you can choose you own frontend! 
-Throughout this documentation I am going to teach you and help you setup:
-- what advantages **NoSQL databases** and *DynamoDB* bring
-- how **authentification** works using **OAuth**
-- how to do **payments** using **Stripe**
-- how to deploy to AWS using **Docker** and the **"Serverless Framework"**
-- how to manage **domains** on AWS
-- how to use **SES** to cheaply send emails 
-so you can effectively use and customize this boilerplate with confidence
+Throughout this documentation I am going to teach how to:
+- use **DynamoDB** as your **NoSQL database**
+- do **authentification** using **OAuth**
+- nable **payments** with **Stripe**
+- deploy to **Lambda** using the **"Serverless Framework"**
+- manage **domains** with **Route53**
+- use the **AWS Simple Email Service** to cheaply send emails 
+- serve static content on the edge using **CloudFront** and **S3**
+- protect your application from malicious trafic with **AWS WAF**
 
-Continue reading to learn how
+
+so you can effectively use and customize this boilerplate with confidence. Continue reading to learn how!

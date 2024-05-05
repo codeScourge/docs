@@ -1,13 +1,12 @@
 ---
-title: "Project Structure"
-icon: excavator
+title: "Overview and Setup"
+icon: wrench
 ---
 Let's start with the big picture: the project structure.
 
 ### development files
 Open the `backend` folder.
 As a Flask developer you will immediately see a familiar pattern:
-- a `static` folder holding your CSS and JS
 - a `templates` with your HTML Jinja templates
 - our Flask application in `app.py`
 - a `requirements.txt` file for our python dependencies
@@ -33,7 +32,8 @@ else:
 ```
 
 Over the course I will refer to both as the `.env` file, use the one according
-to your current stage
+to your current stage. At the top of your `.env` file will be a "SECRET_KEY", used by your Flask application.
+Make sure to change to something secure, like a UUID4 from [here](https://www.uuidgenerator.net/version4).
 
 ### bundling
 Now let's look at the most interesting part: the bundling.
@@ -46,7 +46,7 @@ Open `package.json` and take a look at:
     "watch": "npm-run-all --parallel watch-css watch-js"
   },
 ```
-You can run `watch-css`, `watch-css` or `watch` to watch and bundle the corresponding file types.
+You can run `watch-css`, `watch-js` or `watch` to watch and bundle the corresponding file types.
 As you can see we use PostCSS and a `build.mjs` file to transpile our content from our `src` to our `static` folder.
 Open `postcss.config.js`, here you can see the plugins that we use to:
 - allow importing other `.css` files
@@ -67,26 +67,34 @@ module.exports = {
 };
 ```
 
-Now take a look at the `build.mjs` file. Here we define the files that should be bundled. Then we loop over each of them
+Now take a look at the `build.mjs` file. Here we loop over each file in our `src/js` directory
 and start watching them for changes, when one occurs we create bundle with the same name.
 ```js build.mjs
 import * as esbuild from 'esbuild'
+import fs from "fs";
 
 const srcDir = "./src/js/"
 const distDir = "./backend/static/js/"
-const entryPoints = ["authenticated_home.jsx", "payed_home.jsx", "landing.jsx"];
+const entryPoints = fs.readdirSync(srcDir);
+console.log(entryPoints);
 
 for (const entryPoint of entryPoints) {
-  let ctx = await esbuild.context({
-    entryPoints: [srcDir + entryPoint],
-    outfile: `${distDir}${entryPoint.split('.')[0]}.js`,
-    bundle: true,
-  });
-
-  await ctx.watch();
-  console.log(`Watching ${entryPoint}...`);
+  if (entryPoint.endsWith(".jsx") || entryPoint.endsWith(".js")) {
+    let ctx = await esbuild.context({
+      entryPoints: [srcDir + entryPoint],
+      outfile: `${distDir}${entryPoint.split('.')[0]}.js`,
+      bundle: true,
+    });
+  
+    await ctx.watch();
+    console.log(`Watching ${entryPoint}...`);
+  } else {
+    console.log("Skipping " + entryPoint)
+  }
 }
 ```
+
+All of this combined allows you to write advanced JS and CSS and see it in realtime.
 
 ### deployment files
 Besides the Dockerfile in `backend` we have a few more files, which we will need for deploying our Docker containers in a
@@ -97,3 +105,31 @@ instead of our Flask application, since this is more efficient.
 
 Besides that we have a ``docker-compose.yml`` file, for managing multiple Docker containers and making the communicate.
 
+
+
+### Requirements
+While developing you will need:
+- [Node and NPM](https://nodejs.org/en/download)
+- [Python](https://www.python.org/downloads/)
+- [Stripe CLI](https://docs.stripe.com/stripe-cli)
+
+For deployment install:
+- [Docker](https://docs.docker.com/get-docker/)
+- [AWS-CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [Serverless CLI](https://www.serverless.com/framework/docs-getting-started)
+
+
+### Running the application
+Once we are done with configuration, you will have two choices to start the app:
+- WHEN WORKING LOCALLY: ``bash local.sh`` will start a local (!DEVELOPMENT!) server which listens on Port 8080
+or
+- WHEN DEPLOYING: ``bash docker.sh`` will run the same application with a propper WSGI and
+a production-ready Nginx web-server
+
+Before we can do that, there is just a bit more configuration to do:
+- Setup and connect our database
+- Configure Stripe
+- Create an OAuth application for authentification
+- setup emails
+
+Continue reading the next section to learn how to do this

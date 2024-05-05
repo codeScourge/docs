@@ -18,7 +18,7 @@ For example if you got your domain from GoDaddy, follow [this video](https://www
 the process is the same with other providers. 
 
 Once our domain is added to Route53, we can use it to create and validate an identity in SES itself.
-This can either be single email adress (a@test.com) or a the domain (test.com) which covers all the possible adresses. 
+This can either be single email adress (`a@test.com`) or the domain itself (`test.com`) which covers all the possible adresses. 
 Choose an approach and follow the first 90 seconds of [this video](https://www.youtube.com/watch?v=VWt43MXhuk4).
 
 
@@ -26,7 +26,8 @@ Choose an approach and follow the first 90 seconds of [this video](https://www.y
 SES offers two ways of sending emails: 
 1. through the SMTP interface (Simple Mail Transfer Protocol, just imagine this as the raw request approach) 
 2. using the Python SDK
-For simplicity we will use the SDK, make sure you followed "database" and configured the credentials.
+
+For simplicity we will use the SDK, make sure you have followed [the database chapter](/main/01_database) and configured the credentials.
 
 Now open ``mail.py``, you will see that we can send both text and HTML emails. You will have to create HTML files
 and pass them to the function.
@@ -75,24 +76,12 @@ def send_html_email(email_adress:str, subject:str, html_string:str):
 ```
 
 Do not forget to fill the "FROM_EMAIL" key to `.env`, it has to match the identity you created.
-For example if I have created a global identity for ivanbokarev.top, I can
-use any adress like info@ivanbokarev.top
-
-
-### Writing the Email HTML
-Programmatic emails are a pain in the ass. 
-Instead of writing HTML tables, you can use an open-source library called 
-[React Email](https://github.com/resend/react-email).
-Here we can define our email structure with beatifully styled React components and then compile them into a plain HTML
-file. You can easily implement this yourself by following their documentation
 
 
 ### Receiving emails
-The setup we have is for sending emails only. You can configure SES to handle emails:
-- programmaticaly (it will trigger a Lambda function which performs code and has access to the email)
-- like an inbox with an AWS Workmail setup
+The setup we have is for sending emails only. There are ways to do so programmatically or with an inbox, but they won't be covered in here.
 
 ### Production access
 If you now try to send an email to a different domain, it will fail. The reason is, that SES requires a manual
 check, before they allow you to send emails. This is to avoid malicious activity. For requesting access follow
-[this comprehensive video](https://www.youtube.com/watch?v=WYEEZPkv750&t=368s)
+[this comprehensive video](https://www.youtube.com/watch?v=WYEEZPkv750&t=368s).

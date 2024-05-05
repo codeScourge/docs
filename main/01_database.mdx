@@ -9,15 +9,15 @@ was storage, which is why RDBs are designed to avoid duplication by normalizing 
 As you might guess, compute is now the major bottleneck. 
 Thats where NoSQL databases like DynamoDB come in. They are:
 
-##### 1. faster and more reliable than RDBs
+#### 1. faster and more reliable than RDBs
 NoSQL databases are optimized for speed. You can retrieve items in miliseconds and don't have to use expensive join
 operations.
 
-##### 2. dirt cheap and scale to the moon
+#### 2. dirt cheap and scale to the moon
 You can use on-demand pricing or provision a database starting at 0.95$ per month. They can be scaled virtually unlimited
 since sharding allows them to scale horizontaly.
 
-##### 3. easier to use
+#### 3. easier to use
 DynamoDB is fully managed. You will never have to worry about scaling, provisioning, security, backups, rollbacks, and
 everything else that comes along with a self-hosted database. 
 
@@ -37,7 +37,7 @@ and deploy it locally, but you will have to change the code accordingly.
 
 <img src="../images/dynamo-attributes.png" alt="attributes of our DynamoDB table"/>
 
-**! choose one region which you will use for all of your ressources from now on ! **
+**! choose one region which you will use for all of your ressources from now on !**
 
 Set the primary key as email and leave the search key empty, as this is how we are going to find our users. Also
 add a string property called ``package_id``, more on this later.
@@ -45,9 +45,9 @@ add a string property called ``package_id``, more on this later.
 
 ### interacting through code
 Now lets dive into the code and see how we interact with our database. 
-Open ``backend/db.py`. 
+Open `backend/db.py`. 
 As you can see, we establish a connection to our table based on its name, which is saved in an environment variable.
-Add the name you just created to ``.env``.
+Add the name you just created to `.env` as "DYNAMO_TABLE_NAME".
 
 ```python db.py
 # --- setup Client ---
@@ -79,10 +79,10 @@ def add_user(email:str):
 ```
 
 We use a "ConditionExpression" to only add a user, if he does not yet exist. As you can see, each new user has a 
-"package_id" key set to 0. What it does is represent what package the user has bought:
-- 0 = none
-- 1 = cheap package
-- 2 = expensive package
+"package_id" key set to 0. What it does is represent what package the user has bought. For example:
+- 0: none
+- 1: cheap package
+- 2: expensive package
 
 This can then be used to only allow the user to access certain content, if he has bought the according package.
 Our ``payment_required`` decorator does exactly this:

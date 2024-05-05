@@ -49,8 +49,7 @@
       "group": "Introduction",
       "pages": [
         "intro/00_motivation",
-        "intro/01_structure",
-        "intro/02_installation"
+        "intro/01_structure"
       ]
     },
     {
@@ -60,15 +59,8 @@
         "main/01_database",
         "main/02_payments",
         "main/03_email",
-        "main/04_extras"
-      ]
-    },
-    {
-      "group": "Deployment",
-      "pages": [
-        "deployment/00_overview",
-        "deployment/01_serverless",
-        "deployment/02_provisioned"
+        "main/04_extras",
+        "main/05_deployment"
       ]
     }
   ],

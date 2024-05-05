@@ -18,7 +18,7 @@ Now the next logical step would be to build a simple email login page and do thi
 Instead we use OAuth: the user logs in with another provider like Google or GitHub with their existing
 accounts. The provider then generates the token themselves and gives it to us, so we can access information
 about the user like his email. Why do we do this? Well, originally OAUTH was created for app-developers to
-perform actions on behalf of a user, learn more in [this 5 minute video](https://www.youtube.com/watch?v=KT8ybowdyr0).
+perform actions on behalf of a user (learn more in [this 5 minute video](https://www.youtube.com/watch?v=KT8ybowdyr0)).
 However, the main selling point is the user experience: it is much easier to have one Google account which
 you use to login everywhere instead of creating hundrets of separate accounts.
 
@@ -28,7 +28,7 @@ For GitHub follow [this video](...) and use ``http://localhost/**`` for local de
 once you have deployed your application.
 
 
-Open ``bp_auth.py```:
+Open `bp_auth.py`:
 ```python bp_auth.py
 # --- OAuth setup ---
 CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
